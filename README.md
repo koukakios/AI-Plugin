@@ -1,126 +1,64 @@
 # IntelliAssist AI
 
-Early-stage IntelliJ Platform plugin exploring AI-assisted code understanding directly inside JetBrains IDEs.
+A work-in-progress IntelliJ Platform plugin prototype for AI-assisted code reasoning inside JetBrains IDEs.
 
-The goal of this project is to build a lightweight developer assistant that can work with selected code and provide useful explanations, refactoring ideas, bug checks, and test-case suggestions without forcing the developer to leave the editor.
+This repository is intended to demonstrate an early plugin architecture and developer tooling, not a finished production product. It shows how selected editor text can flow through prompt templates, a configurable AI client abstraction, and lightweight UI integration.
 
-> Status: Work in progress.  
-> This repository currently contains the initial plugin structure, editor action flow, prompt design, API-client abstraction, and a basic tool-window prototype. It is not presented as a finished production plugin.
-
----
-
-## Motivation
-
-Modern IDEs already provide strong static analysis, navigation, and refactoring support. However, developers often still need help with higher-level reasoning tasks such as:
-
-- understanding unfamiliar code quickly,
-- identifying possible edge cases,
-- generating meaningful unit-test ideas,
-- explaining legacy logic,
-- receiving refactoring suggestions in natural language.
-
-This project explores how an IntelliJ plugin can combine IDE context with an AI backend to support those workflows.
-
-The focus is not just “calling an AI API”, but designing a clean plugin architecture around:
-
-- selected editor text,
-- prompt templates,
-- action handlers,
-- UI integration,
-- future API-provider flexibility,
-- safe handling of incomplete or sensitive code context.
+> Status: Early-stage prototype. This repository contains an initial IntelliJ plugin skeleton, a selected-code explain action, prompt templates, a mock AI client, and a basic tool window.
 
 ---
 
-## Planned Features
+## What this project includes
 
-### Code Explanation
-
-Select a block of code and request a plain-English explanation.
-
-Example use cases:
-
-- understand a method quickly,
-- explain control flow,
-- summarize unfamiliar Java/Kotlin code,
-- describe the purpose of a class or function.
+- Kotlin-based IntelliJ plugin skeleton using Gradle Kotlin DSL
+- `ExplainSelectionAction` for selected text processing
+- `PromptTemplates.kt` for explain/refactor/bug-check/test-case prompts
+- `AiClient` abstraction and `MockAiClient` implementation
+- `plugin.xml` registration and a simple tool window factory
+- A clear work-in-progress README and repository structure
 
 ---
 
-### Refactoring Suggestions
+## Why this matters
 
-Generate possible improvements for selected code.
+The plugin is designed to support workflows where developers want:
 
-Examples:
+- quick natural-language explanations of selected code
+- refactoring ideas for confusing logic
+- early bug and edge-case checks
+- suggested test cases based on code intent
 
-- simplify nested conditionals,
-- suggest clearer naming,
-- identify duplicated logic,
-- improve separation of concerns,
-- recommend smaller functions.
-
----
-
-### Bug and Edge-Case Checks
-
-Ask the assistant to inspect selected code for likely issues.
-
-Examples:
-
-- null-handling problems,
-- boundary cases,
-- exception paths,
-- off-by-one mistakes,
-- unclear assumptions.
+The current version is intentionally honest about its prototype status.
 
 ---
 
-### Test-Case Ideas
+## Repository structure
 
-Generate candidate test cases from selected code.
-
-Examples:
-
-- happy-path cases,
-- edge cases,
-- invalid input cases,
-- regression test ideas,
-- branch-coverage suggestions.
+- `build.gradle.kts` — Gradle Kotlin DSL build setup
+- `settings.gradle.kts` — root project name
+- `plugin.xml` — IntelliJ plugin metadata and registrations
+- `src/main/kotlin/` — plugin Kotlin source files
+- `src/main/resources/` — plugin metadata resources
 
 ---
 
-## Current Scope
+## Getting started
 
-The current implementation focuses on the plugin foundation:
+1. Open the project in IntelliJ IDEA with the Gradle Kotlin DSL files.
+2. Use the IntelliJ Gradle tool window to import the project.
+3. Run the plugin from the IDE using the `runIde` Gradle task.
 
-- IntelliJ Platform plugin setup
-- Gradle-based build configuration
-- basic editor action for selected text
-- prompt-template layer
-- AI client abstraction
-- mock AI client for local development
-- basic tool-window placeholder
-
-The current version does **not** claim to provide a complete AI assistant yet. The purpose of the repository is to show the implementation direction and the engineering structure behind the project.
+> Note: This is a prototype skeleton. The plugin currently uses `MockAiClient` and does not connect to an actual AI provider.
 
 ---
 
-## Architecture
+## Next steps
 
-```txt
-Editor Selection
-      |
-      v
-IntelliJ Action Handler
-      |
-      v
-Prompt Template Builder
-      |
-      v
-AI Client Interface
-      |
-      v
-Mock / Future Real API Provider
-      |
-      v
-Tool Window / Notification Output
+Possible future improvements include:
+
+- real AI backend integration
+- safe context filtering for selected code
+- richer UI and output panels
+- explanations for different languages and file types
+- unit tests for prompt generation and action behavior
+
