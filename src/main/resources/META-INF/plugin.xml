@@ -1,0 +1,27 @@
+<idea-plugin>
+  <id>com.koukakios.intellijassist</id>
+  <name>IntelliAssist AI</name>
+  <version>0.1.0</version>
+  <vendor email="dev@example.com" url="https://github.com/koukakios/AI-Plugin">koukakios</vendor>
+
+  <description>
+    A work-in-progress AI-assisted IntelliJ plugin that provides selected-code explainability, refactor suggestions, bug checks, and test-case prompts.
+  </description>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <actions>
+    <action id="IntelliAssist.ExplainSelection"
+            class="com.koukakios.intellijassist.ExplainSelectionAction"
+            text="Explain Selection"
+            description="Explain the selected code using an AI prompt template."/>
+  </actions>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindowFactory
+        factoryClass="com.koukakios.intellijassist.IntelliAssistToolWindowFactory"
+        id="IntelliAssist"
+        anchor="right"
+        secondary="true" />
+  </extensions>
+</idea-plugin>
