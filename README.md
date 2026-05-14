@@ -1,64 +1,100 @@
-# IntelliAssist AI
+# ContextPilot
 
-A work-in-progress IntelliJ Platform plugin prototype for AI-assisted code reasoning inside JetBrains IDEs.
+ContextPilot is a small IntelliJ Platform plugin that converts selected code and IDE metadata into an AI-ready prompt. The generated prompt can be copied into ChatGPT, Claude, Gemini, or another AI coding assistant.
 
-This repository is intended to demonstrate an early plugin architecture and developer tooling, not a finished production product. It shows how selected editor text can flow through prompt templates, a configurable AI client abstraction, and lightweight UI integration.
+The MVP is provider-agnostic: it focuses on extracting useful context from the IDE and formatting it into a structured prompt.
 
-> Status: Early-stage prototype. This repository contains an initial IntelliJ plugin skeleton, a selected-code explain action, prompt templates, a mock AI client, and a basic tool window.
+## Motivation
 
----
+AI coding assistants work better when they receive clear, structured context. ContextPilot explores the IDE-specific context extraction part of AI-assisted coding: selected source code, file metadata, project information, and workflow-specific prompt framing.
 
-## What this project includes
+## Features
 
-- Kotlin-based IntelliJ plugin skeleton using Gradle Kotlin DSL
-- `ExplainSelectionAction` for selected text processing
-- `PromptTemplates.kt` for explain/refactor/bug-check/test-case prompts
-- `AiClient` abstraction and `MockAiClient` implementation
-- `plugin.xml` registration and a simple tool window factory
-- A clear work-in-progress README and repository structure
+- Extracts selected code from the IntelliJ editor
+- Captures the project name
+- Captures the file path
+- Captures the language/file type
+- Supports prompt modes:
+  - Explain Code
+  - Review for Bugs
+  - Suggest Refactor
+  - Generate Tests
+- Shows a scrollable preview dialog
+- Copies the generated prompt to the clipboard
+- Available from the editor right-click menu
 
----
+## Demo Flow
 
-## Why this matters
+1. Select code in the IntelliJ editor.
+2. Right click in the editor.
+3. Click **Generate AI Context**.
+4. Choose a prompt mode.
+5. Preview the generated prompt.
+6. Copy the prompt.
+7. Paste it into an AI assistant.
 
-The plugin is designed to support workflows where developers want:
+## How to Run
 
-- quick natural-language explanations of selected code
-- refactoring ideas for confusing logic
-- early bug and edge-case checks
-- suggested test cases based on code intent
+Requirements:
 
-The current version is intentionally honest about its prototype status.
+- JDK 17
+- IntelliJ IDEA
+- Gradle wrapper
 
----
+On Windows:
 
-## Repository structure
+```powershell
+.\gradlew.bat runIde
+```
 
-- `build.gradle.kts` — Gradle Kotlin DSL build setup
-- `settings.gradle.kts` — root project name
-- `plugin.xml` — IntelliJ plugin metadata and registrations
-- `src/main/kotlin/` — plugin Kotlin source files
-- `src/main/resources/` — plugin metadata resources
+This opens a second IntelliJ IDEA instance with the plugin installed.
 
----
+## Project Structure
 
-## Getting started
+```text
+AI-Plugin/
+|-- build.gradle.kts
+|-- settings.gradle.kts
+|-- src/main/java/com/koukakios/contextpilot/
+|   |-- GenerateContextAction.java
+|   |-- CodeContext.java
+|   |-- CodeContextExtractor.java
+|   |-- PromptBuilder.java
+|   |-- PromptMode.java
+|   `-- GeneratedPromptDialog.java
+`-- src/main/resources/META-INF/plugin.xml
+```
 
-1. Open the project in IntelliJ IDEA with the Gradle Kotlin DSL files.
-2. Use the IntelliJ Gradle tool window to import the project.
-3. Run the plugin from the IDE using the `runIde` Gradle task.
+## Architecture
 
-> Note: This is a prototype skeleton. The plugin currently uses `MockAiClient` and does not connect to an actual AI provider.
+- `GenerateContextAction`: IntelliJ action entry point for the editor right-click menu.
+- `CodeContextExtractor`: extracts project, editor, file, and selected-code context using IntelliJ APIs.
+- `CodeContext`: plain immutable data holder for extracted IDE context.
+- `PromptBuilder`: builds structured prompts from code context and the selected prompt mode.
+- `PromptMode`: enum representing the supported AI coding workflows.
+- `GeneratedPromptDialog`: Swing UI for previewing and copying generated prompts.
 
----
+## Design Decisions
 
-## Next steps
+- Java was used instead of Kotlin because I wanted a readable implementation under a short time constraint.
+- No LLM API call is included in the MVP because the goal is provider-agnostic IDE context extraction and prompt construction.
+- Prompt modes represent different AI coding workflows rather than a single generic prompt.
+- A dialog UI was chosen because it is simple, testable, and enough for an MVP.
 
-Possible future improvements include:
+## Limitations
 
-- real AI backend integration
-- safe context filtering for selected code
-- richer UI and output panels
-- explanations for different languages and file types
-- unit tests for prompt generation and action behavior
+- Only selected code is included.
+- No surrounding method/class context yet.
+- No API integration yet.
+- No prompt history.
+- No settings page.
+- No automated tests yet.
 
+## Future Work
+
+- Include surrounding method/class context using IntelliJ PSI.
+- Include imports and package declarations.
+- Add configurable prompt templates.
+- Add optional AI provider integration.
+- Add a persistent tool window or prompt history.
+- Add tests for prompt generation.
