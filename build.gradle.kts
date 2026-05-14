@@ -1,38 +1,29 @@
-import org.jetbrains.intellij.tasks.PatchPluginXmlTask
-
 plugins {
-    kotlin("jvm") version "1.9.0"
-    id("org.jetbrains.intellij") version "1.16.0"
+    id("java")
+    id("org.jetbrains.intellij") version "1.17.4"
 }
 
-group = "com.koukakios.intellijassist"
+group = "com.koukakios.contextpilot"
 version = "0.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
-dependencies {
-    testImplementation(kotlin("test"))
-}
-
-kotlin {
-    jvmToolchain(17)
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 intellij {
     version.set("2023.3")
     type.set("IC")
-    plugins.set(listOf("java"))
 }
 
 tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-    }
-
     patchPluginXml {
         sinceBuild.set("233")
-        untilBuild.set("240.*")
+        untilBuild.set("243.*")
     }
 }
