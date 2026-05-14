@@ -1,5 +1,12 @@
 package com.koukakios.contextpilot;
 
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.ui.Messages;
+import org.jetbrains.annotations.NotNull;
+import javax.swing.JButton;
+
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -120,25 +127,63 @@ public class GeneratedPromptDialog extends DialogWrapper {
     }
 
     /**
-     * Creates dialog buttons, including the custom copy-to-clipboard action.
+     * Creates dialog buttons, including the custom copy-to-clipboard action and Ask AI action.
      */
     @Override
     protected Action[] createActions() {
+        // 1. Your existing Copy Action
         Action copyAction = new AbstractAction("Copy Prompt") {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent event) {
                 String prompt = promptArea.getText();
-
-                CopyPasteManager.getInstance()
-                        .setContents(new StringSelection(prompt));
-
+                CopyPasteManager.getInstance().setContents(new StringSelection(prompt));
                 close(OK_EXIT_CODE);
             }
         };
 
+        // 2. The new Ask AI Action
+        Action askAiAction = new AbstractAction("Ask AI (Gemini)") {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent event) {
+                String finalPrompt = promptArea.getText();
+
+                // Start the IntelliJ Background Task
+                new Task.Backgroundable(context.getProjectName() != null ? com.intellij.openapi.project.ProjectManager.getInstance().getOpenProjects()[0] : null, "ContextPilot: Asking Gemini...", true) {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        indicator.setIndeterminate(true);
+
+                        try {
+                            // Spin up the engine we just built
+                            AiClient aiClient = new GeminiClient();
+                            String response = aiClient.askAi(finalPrompt);
+
+                            // We have the answer! Now we must go back to the main UI thread to show it
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                // Replace the prompt text with the AI's answer
+                                promptArea.setText("=== AI RESPONSE ===\n\n" + response);
+                                promptArea.setCaretPosition(0); // scroll to top
+                            });
+
+                        } catch (Exception ex) {
+                            // If the internet drops or the key is wrong, show a nice error popup
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                Messages.showErrorDialog(
+                                        "Failed to connect to Gemini: " + ex.getMessage(),
+                                        "AI Connection Error");
+                            });
+                        }
+                    }
+                }.queue(); // start the background thread
+            }
+        };
+
+        // 3. Return the array of buttons you want to show
+        // Note: We put the Ask AI button on the left, then Copy, then the default OK/Cancel
         return new Action[]{
+                askAiAction,
                 copyAction,
-                getOKAction()
+                getCancelAction() // It's usually better to have Cancel instead of OK if you don't actually "save" anything
         };
     }
 }
