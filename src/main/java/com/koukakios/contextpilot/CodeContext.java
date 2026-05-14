@@ -1,5 +1,10 @@
 package com.koukakios.contextpilot;
-
+/**
+ * Immutable data holder for the IDE context used to build an AI prompt.
+ *
+ * This object keeps the extracted project metadata and selected code together,
+ * so the prompt-building logic does not need to know anything about IntelliJ APIs.
+ */
 public class CodeContext {
 
     private final String projectName;

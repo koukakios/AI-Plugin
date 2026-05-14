@@ -6,11 +6,18 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
+import javax.swing.BorderFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
+/**
+ * Dialog for previewing and copying the generated AI prompt.
+ *
+ * The dialog shows project/file metadata, lets the user choose a prompt mode,
+ * previews the generated prompt, and provides a copy-to-clipboard action.
+ */
 public class GeneratedPromptDialog extends DialogWrapper {
 
     private final CodeContext context;
@@ -30,6 +37,9 @@ public class GeneratedPromptDialog extends DialogWrapper {
         init();
     }
 
+    /**
+     * Creates the main dialog UI: header, metadata section, and prompt preview area.
+     */
     @Override
     protected @Nullable JComponent createCenterPanel() {
         JPanel rootPanel = new JPanel(new BorderLayout());
@@ -44,8 +54,11 @@ public class GeneratedPromptDialog extends DialogWrapper {
         promptArea.setLineWrap(true);
         promptArea.setWrapStyleWord(true);
         promptArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 13));
+        promptArea.setMargin(JBUI.insets(10));
+        promptArea.setOpaque(true);
 
         JBScrollPane scrollPane = new JBScrollPane(promptArea);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Generated prompt"));
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(headerPanel, BorderLayout.NORTH);
@@ -79,13 +92,17 @@ public class GeneratedPromptDialog extends DialogWrapper {
         JPanel panel = new JPanel(new GridLayout(3, 1));
         panel.setBorder(JBUI.Borders.emptyBottom(10));
 
-        panel.add(new JLabel("Project: " + context.getProjectName()));
-        panel.add(new JLabel("File: " + context.getFilePath()));
-        panel.add(new JLabel("Language: " + context.getLanguage()));
+        panel.add(new JLabel("<html><b>Project:</b> " + context.getProjectName() + "</html>"));
+        panel.add(new JLabel("<html><b>File:</b> " + context.getFilePath() + "</html>"));
+        panel.add(new JLabel("<html><b>Language:</b> " + context.getLanguage() + "</html>"));
 
         return panel;
     }
 
+
+    /**
+     * Rebuilds the prompt whenever the selected prompt mode changes.
+     */
     private void updatePrompt() {
         if (promptArea == null || modeComboBox == null) {
             return;
@@ -102,6 +119,9 @@ public class GeneratedPromptDialog extends DialogWrapper {
         promptArea.setCaretPosition(0);
     }
 
+    /**
+     * Creates dialog buttons, including the custom copy-to-clipboard action.
+     */
     @Override
     protected Action[] createActions() {
         Action copyAction = new AbstractAction("Copy Prompt") {

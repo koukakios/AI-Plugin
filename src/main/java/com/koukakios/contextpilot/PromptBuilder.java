@@ -1,7 +1,20 @@
 package com.koukakios.contextpilot;
 
+/**
+ * Builds structured AI-ready prompts from extracted IDE context.
+ *
+ * The builder is intentionally independent from IntelliJ APIs, making it easier
+ * to test and change prompt wording without touching plugin action code.
+ */
 public class PromptBuilder {
 
+    /**
+     * Builds a prompt for the selected prompt mode.
+     *
+     * @param context extracted IDE/editor context
+     * @param mode selected prompt workflow
+     * @return formatted prompt ready to copy into an AI assistant
+     */
     public String buildPrompt(CodeContext context, PromptMode mode) {
         return switch (mode) {
             case EXPLAIN -> buildExplainPrompt(context);
@@ -63,6 +76,9 @@ public class PromptBuilder {
                 """);
     }
 
+    /**
+     * Builds the shared prompt structure used by all prompt modes.
+     */
     private String basePrompt(CodeContext context, String task) {
         return """
                 You are an AI coding assistant helping with code inside an IntelliJ project.
