@@ -21,9 +21,9 @@ public class GenerateContextAction extends AnAction {
             return;
         }
 
-        String prompt = promptBuilder.buildPrompt(context);
+        GeneratedPromptDialog dialog =
+                new GeneratedPromptDialog(event.getProject(), context, promptBuilder);
 
-        GeneratedPromptDialog dialog = new GeneratedPromptDialog(event.getProject(), prompt);
         dialog.show();
     }
 }
