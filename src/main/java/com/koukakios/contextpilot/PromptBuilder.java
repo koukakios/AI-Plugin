@@ -4,27 +4,26 @@ public class PromptBuilder {
 
     public String buildPrompt(CodeContext context) {
         return """
-                You are helping me understand and improve code from an IntelliJ project.
+                You are an AI coding assistant helping with code inside an IntelliJ project.
 
-                Project:
-                %s
-
-                File:
-                %s
-
-                Language:
-                %s
+                IDE context:
+                - Project: %s
+                - File: %s
+                - Language: %s
 
                 Selected code:
                 ```%s
                 %s
                 ```
 
-                Please explain:
-                1. What this code does
+                Task:
+                Explain the selected code clearly.
+
+                Please include:
+                1. What the code does
                 2. The important logic step by step
-                3. Any bugs or suspicious parts
-                4. Possible improvements
+                3. Any bugs, suspicious parts, or edge cases
+                4. Suggestions for improving readability, correctness, or maintainability
                 """.formatted(
                 context.getProjectName(),
                 context.getFilePath(),

@@ -14,6 +14,8 @@
     <action id="ContextPilot.GenerateContext"
             class="com.koukakios.contextpilot.GenerateContextAction"
             text="Generate AI Context"
-            description="Generate an AI-ready prompt from the selected code."/>
+            description="Generate an AI-ready prompt from the selected code.">
+      <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+    </action>
   </actions>
 </idea-plugin>
