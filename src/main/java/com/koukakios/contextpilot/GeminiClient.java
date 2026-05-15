@@ -6,12 +6,22 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+/**
+ * Sends prompts to the Gemini API and extracts the generated text response.
+ */
 public class GeminiClient implements AiClient {
 
-    // We use the lightning-fast Flash model for IDEs
+    /** Gemini API endpoint for the Flash model used by the plugin. */
     private static final String GEMINI_API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=";
 
+    /**
+     * Sends the provided prompt to Gemini and returns the parsed text response.
+     *
+     * @param prompt complete prompt to send to Gemini
+     * @return generated response text
+     * @throws Exception if the API key is missing, the request fails, or the response cannot be parsed
+     */
     @Override
     public String askAi(String prompt) throws Exception {
         // 1. Grab the API key from the computer's environment variables
@@ -57,7 +67,13 @@ public class GeminiClient implements AiClient {
         return extractTextFromJson(response.body());
     }
 
-    // A lightweight helper to pull the text out of Google's JSON response
+    /**
+     * Extracts the generated text field from the Gemini JSON response.
+     *
+     * @param json raw Gemini JSON response body
+     * @return generated response text with common escape sequences decoded
+     * @throws Exception if the expected text field cannot be found
+     */
     private String extractTextFromJson(String json) throws Exception {
         String searchKey = "\"text\": \"";
         int startIndex = json.indexOf(searchKey);

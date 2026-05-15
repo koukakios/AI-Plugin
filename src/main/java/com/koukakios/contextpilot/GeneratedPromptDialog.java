@@ -21,21 +21,44 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 
+/**
+ * Displays the generated prompt and AI response workflow in an IntelliJ dialog.
+ *
+ * The dialog lets users review generated context, switch prompt modes, send the
+ * prompt to Gemini, and copy the returned answer.
+ */
 public class GeneratedPromptDialog extends DialogWrapper {
 
+    /** IntelliJ project associated with the dialog, if available. */
     private final Project project;
+    /** Extracted code context used to build prompts. */
     private final CodeContext context;
+    /** Prompt builder used to render mode-specific prompts. */
     private final PromptBuilder promptBuilder;
-    private final GeminiClient aiClient; // We need the client to make the call!
+    /** Gemini client used to request AI responses. */
+    private final GeminiClient aiClient;
 
+    /** Text area containing the generated prompt. */
     private JTextArea promptArea;
+    /** HTML-capable pane used to render AI responses. */
     private JEditorPane aiResponseArea;
+    /** Tab container for prompt preview and AI response views. */
     private JBTabbedPane tabbedPane;
+    /** Prompt mode selector shown in the dialog header. */
     private JComboBox<PromptMode> modeComboBox;
+    /** Loading indicator displayed while the AI request is running. */
     private AsyncProcessIcon loadingIcon;
 
+    /** Last raw AI response available for copying. */
     private String lastAiResponse = "";
 
+    /**
+     * Creates the prompt dialog for the provided project context.
+     *
+     * @param project IntelliJ project used as the dialog parent
+     * @param context extracted IDE context used for prompt generation
+     * @param promptBuilder builder that creates prompts for each selected mode
+     */
     public GeneratedPromptDialog(@Nullable Project project, CodeContext context, PromptBuilder promptBuilder) {
         super(project);
         this.project = project;
@@ -48,6 +71,11 @@ public class GeneratedPromptDialog extends DialogWrapper {
         init();
     }
 
+    /**
+     * Creates the main dialog content panel.
+     *
+     * @return center panel containing prompt and AI response tabs
+     */
     @Override
     protected @Nullable JComponent createCenterPanel() {
         JPanel rootPanel = new JPanel(new BorderLayout());
@@ -94,6 +122,11 @@ public class GeneratedPromptDialog extends DialogWrapper {
         return rootPanel;
     }
 
+    /**
+     * Creates the title and prompt mode selector header.
+     *
+     * @return header panel for the dialog
+     */
     private JPanel createHeaderPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(JBUI.Borders.emptyBottom(10));
@@ -108,6 +141,11 @@ public class GeneratedPromptDialog extends DialogWrapper {
         return panel;
     }
 
+    /**
+     * Creates the metadata panel that displays project, file, and language context.
+     *
+     * @return metadata panel for the selected code context
+     */
     private JPanel createMetadataPanel() {
         JPanel panel = new JPanel(new GridLayout(3, 1));
         panel.setBorder(JBUI.Borders.emptyBottom(15));
@@ -117,9 +155,19 @@ public class GeneratedPromptDialog extends DialogWrapper {
         return panel;
     }
 
+    /**
+     * Creates the dialog actions used to request AI output, close the dialog, and copy answers.
+     *
+     * @return available dialog actions
+     */
     @Override
     protected Action @NotNull [] createActions() {
         Action copyAction = new AbstractAction("Copy Answer") {
+            /**
+             * Copies the most recent AI response to the clipboard when available.
+             *
+             * @param e action event emitted by the Swing button
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!lastAiResponse.isEmpty()) {
@@ -130,7 +178,9 @@ public class GeneratedPromptDialog extends DialogWrapper {
         return new Action[]{getOKAction(), getCancelAction(), copyAction};
     }
 
-    // --- THE MAGIC HAPPENS HERE ---
+    /**
+     * Sends the current prompt to Gemini in a background task.
+     */
     @Override
     protected void doOKAction() {
         String prompt = getGeneratedPrompt();
@@ -142,6 +192,11 @@ public class GeneratedPromptDialog extends DialogWrapper {
 
         // 2. Run the network request on a background thread so the IDE doesn't freeze
         Task.Backgroundable task = new Task.Backgroundable(project, "Asking Gemini...", true) {
+            /**
+             * Performs the Gemini request on a background thread.
+             *
+             * @param indicator progress indicator for the background task
+             */
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
@@ -167,6 +222,9 @@ public class GeneratedPromptDialog extends DialogWrapper {
         ProgressManager.getInstance().run(task);
     }
 
+    /**
+     * Rebuilds the prompt preview for the currently selected prompt mode.
+     */
     private void updatePrompt() {
         if (promptArea == null || modeComboBox == null) return;
         PromptMode selectedMode = (PromptMode) modeComboBox.getSelectedItem();
@@ -176,6 +234,11 @@ public class GeneratedPromptDialog extends DialogWrapper {
         promptArea.setCaretPosition(0);
     }
 
+    /**
+     * Shows or hides the loading indicator.
+     *
+     * @param isLoading true to show and resume the loading indicator; false to hide and suspend it
+     */
     public void showLoading(boolean isLoading) {
         if (loadingIcon != null) {
             loadingIcon.setVisible(isLoading);
@@ -187,6 +250,11 @@ public class GeneratedPromptDialog extends DialogWrapper {
         }
     }
 
+    /**
+     * Stores and renders an AI response, then switches to the response tab.
+     *
+     * @param rawMarkdown raw Markdown response returned by the AI provider
+     */
     public void setAiResponse(String rawMarkdown) {
         this.lastAiResponse = rawMarkdown;
         String html = convertMarkdownToHtml(rawMarkdown);
@@ -195,10 +263,21 @@ public class GeneratedPromptDialog extends DialogWrapper {
         tabbedPane.setSelectedIndex(1); // Auto-switch to the AI Assistant tab
     }
 
+    /**
+     * Returns the currently generated prompt text.
+     *
+     * @return generated prompt shown in the prompt preview area
+     */
     public String getGeneratedPrompt() {
         return promptArea.getText();
     }
 
+    /**
+     * Converts a small Markdown subset into HTML suitable for the Swing response pane.
+     *
+     * @param markdown raw Markdown text returned by the AI provider
+     * @return HTML document string for rendering in the dialog
+     */
     private String convertMarkdownToHtml(String markdown) {
         if (markdown == null || markdown.isEmpty()) return "";
 
