@@ -14,7 +14,7 @@ public class GeminiClient implements AiClient {
 
     @Override
     public String askAi(String prompt) throws Exception {
-        // 1. Grab the API key from your computer's environment variables
+        // 1. Grab the API key from the computer's environment variables
         String apiKey = System.getenv("GEMINI_API_KEY");
         if (apiKey == null || apiKey.trim().isEmpty()) {
             throw new Exception("GEMINI_API_KEY environment variable is missing!");

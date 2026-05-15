@@ -27,13 +27,13 @@ public class PromptBuilder {
     private String buildExplainPrompt(CodeContext context) {
         return basePrompt(context, """
                 Task:
-                Explain the selected code clearly.
+                Explain the selected code clearly and concisely.
 
                 Please include:
-                1. What the code does
+                1. What the code does (in 1-2 sentences)
                 2. The important logic step by step
-                3. Any confusing parts
-                4. Possible improvements
+                3. Any bugs, syntax errors, or confusing parts
+                4. A SINGLE refactored and improved version of the code (combine all improvements into one block, do not show multiple intermediate steps)
                 """);
     }
 
