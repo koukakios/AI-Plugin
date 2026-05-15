@@ -24,19 +24,31 @@ public class PromptBuilder {
         };
     }
 
+    /**
+     * Builds a prompt that asks the AI to explain the selected code.
+     *
+     * @param context extracted IDE/editor context
+     * @return formatted explanation prompt
+     */
     private String buildExplainPrompt(CodeContext context) {
         return basePrompt(context, """
                 Task:
-                Explain the selected code clearly.
+                Explain the selected code clearly and concisely.
 
                 Please include:
-                1. What the code does
+                1. What the code does (in 1-2 sentences)
                 2. The important logic step by step
-                3. Any confusing parts
-                4. Possible improvements
+                3. Any bugs, syntax errors, or confusing parts
+                4. A SINGLE refactored and improved version of the code (combine all improvements into one block, do not show multiple intermediate steps)
                 """);
     }
 
+    /**
+     * Builds a prompt that asks the AI to review the selected code.
+     *
+     * @param context extracted IDE/editor context
+     * @return formatted code review prompt
+     */
     private String buildReviewPrompt(CodeContext context) {
         return basePrompt(context, """
                 Task:
@@ -50,6 +62,12 @@ public class PromptBuilder {
                 """);
     }
 
+    /**
+     * Builds a prompt that asks the AI to suggest refactoring improvements.
+     *
+     * @param context extracted IDE/editor context
+     * @return formatted refactoring prompt
+     */
     private String buildRefactorPrompt(CodeContext context) {
         return basePrompt(context, """
                 Task:
@@ -63,6 +81,12 @@ public class PromptBuilder {
                 """);
     }
 
+    /**
+     * Builds a prompt that asks the AI to generate tests for the selected code.
+     *
+     * @param context extracted IDE/editor context
+     * @return formatted test-generation prompt
+     */
     private String buildTestsPrompt(CodeContext context) {
         return basePrompt(context, """
                 Task:
@@ -78,6 +102,10 @@ public class PromptBuilder {
 
     /**
      * Builds the shared prompt structure used by all prompt modes.
+     *
+     * @param context extracted IDE/editor context
+     * @param task task-specific instructions appended to the base prompt
+     * @return complete formatted prompt
      */
     private String basePrompt(CodeContext context, String task) {
         return """

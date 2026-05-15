@@ -13,13 +13,17 @@ import com.intellij.openapi.ui.Messages;
  */
 public class GenerateContextAction extends AnAction {
 
+    /** Extracts editor and project context from the current IntelliJ action event. */
     private final CodeContextExtractor extractor = new CodeContextExtractor();
+    /** Builds AI-ready prompts from extracted code context. */
     private final PromptBuilder promptBuilder = new PromptBuilder();
 
     /**
      * Runs when the user triggers "Generate AI Context".
      *
      * The method coordinates extraction, validation, prompt building, and UI display.
+     *
+     * @param event IntelliJ action event triggered by the user
      */
     @Override
     public void actionPerformed(AnActionEvent event) {
